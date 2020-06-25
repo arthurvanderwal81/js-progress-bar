@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <style>
+            .progressBarContainer
+            {
+                width: 250px;
+                margin: 10px;
+            }
+
+            .progressBar
+            {
+                position: relative;
+                text-align: center;
+                border-width: 1px;
+                border-style: solid;
+                width: 100%;
+                background-color: #000;
+            }
+
+            .progress
+            {
+                text-align: center;
+                background-color: #0f0;
+            }
+
+            .progressBar span
+            {
+                display: inline-block;
+                text-decoration: bold;
+                font-weight: bold;
+                color: #fff;
+            }
+
+        </style>
+
+        <script type="text/javascript">
+            function initProgress()
+            {
+                let spans = this.querySelectorAll("span");
+
+                for (let i = 0; i < spans.length; i++)
+                {
+                    spans[i].style.color = this.dataset.textColor;
+                }
+
+                this.style.backgroundColor = this.dataset.color;
+                console.log(this.style.backgroundColor);
+                this.setProgress(this.dataset.value);
+            }
+
+            function setProgress(value)
+            {
+                let maxValue = this.dataset.maxValue;
+                let progress = (value / maxValue * 100.0).toFixed(0);
+
+                this.style.width = progress + "%";
+
+                if (this.querySelector("span") != null)
+                {
+                    this.querySelector("span").innerText = this.style.width;
+                }
+                else if (this.parentNode.querySelector("span") != null)
+                {
+                    this.parentNode.querySelector("span").innerText = this.style.width;
+                }
+            }
+
+            function startProgress(intervalMs, incrementValue)
+            {
+                this.dataset.autoIncrease = incrementValue;
+                let progressBar = this;
+
+                this.progressIntervalHandle = setInterval(function(progressBar) {
+
+                        let currentValue = parseInt(progressBar.dataset.value);
+                        currentValue = Math.min(progressBar.dataset.maxValue, currentValue + parseInt(progressBar.dataset.autoIncrease));
+                        progressBar.dataset.value = currentValue;
+
+                        progressBar.setProgress(progressBar.dataset.value);
+
+                        if (currentValue == progressBar.dataset.maxValue)
+                        {
+                            clearInterval(progressBar.progressIntervalHandle);
+                        }
+                }, intervalMs, this);
+            }
+
+            window.addEventListener("load", function() {
+                let progressBars = document.querySelectorAll(".progress");
+
+                for (let i = 0; i < progressBars.length; i++)
+                {
+                    let progressBar = progressBars[i];
+
+                    progressBar.initProgress = initProgress;
+                    progressBar.setProgress = setProgress;
+                    progressBar.startProgress = startProgress;
+
+                    progressBar.initProgress();
+                    //progressBar.setProgress(10);
+                    progressBar.startProgress(Math.max(1, Math.random() * 500), Math.max(1, Math.random() * 5));
+                }
+            });
+
+        </script>
+    </head>
+    <body>
+        <div class="progressBarContainer">
+            <div class="progressBar">
+                <div class="progress" data-value="1" data-min-value="0" data-max-value="100" data-auto-increase="1" data-text-color="#000" data-color="#ff0">
+                    <span></span>
+                </div>
+                <div style="position: absolute; top: 0px; left: 0px; width: 100%; text-align: center;">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="progressBarContainer">
+            <div class="progressBar">
+                <div class="progress" data-value="1" data-min-value="0" data-max-value="100" data-auto-increase="1" data-text-color="#fff" data-color="#0f0">
+                    <span></span>
+                </div>
+                <div style="position: absolute; top: 0px; left: 0px; width: 100%; text-align: center;">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
